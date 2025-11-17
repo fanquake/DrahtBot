@@ -166,7 +166,8 @@ understanding of the project's requirements and goals.
                     .title(".")
                     .body(".")
                     .state(octocrab::models::IssueState::Closed)
-                    .state_reason(octocrab::models::issues::IssueStateReason::NotPlanned)
+                    // Avoid IssueStateReason, because it does not work on pull requests
+                    //.state_reason(octocrab::models::issues::IssueStateReason::NotPlanned)
                     .labels(&[])
                     .send()
                     .await?;
@@ -284,7 +285,8 @@ async fn spam_follow_up(
                 .title(".")
                 .body(".")
                 .state(octocrab::models::IssueState::Closed)
-                .state_reason(octocrab::models::issues::IssueStateReason::NotPlanned)
+                // Avoid IssueStateReason, because it does not work on pull requests
+                //.state_reason(octocrab::models::issues::IssueStateReason::NotPlanned)
                 .labels(&[])
                 .send()
                 .await?;
