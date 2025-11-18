@@ -1,10 +1,4 @@
 repositories:
-  - repo_slug: rust-bitcoin/rust-bitcoin
-    backport_label: null
-    repo_labels:
-    spam_detection: false
-    ci_status: false
-    corecheck: false
   - repo_slug: maflcko/DrahtBot
     backport_label: Backport
     repo_labels:
