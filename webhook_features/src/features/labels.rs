@@ -53,7 +53,7 @@ impl Feature for LabelsFeature {
             GitHubEvent::PullRequest
                 if action == "unlabeled" || action == "opened" || action == "edited" =>
             {
-                // https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
+                // https://docs.github.com/en/webhooks/webhook-events-and-payloads?actionType=opened#pull_request
                 if let Some(config_repo) = ctx
                     .config
                     .repositories

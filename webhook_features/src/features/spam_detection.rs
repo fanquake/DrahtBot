@@ -63,7 +63,7 @@ impl Feature for SpamDetectionFeature {
         let pulls_api = ctx.octocrab.pulls(repo_user, repo_name);
         match event {
             GitHubEvent::PullRequest => {
-                // https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
+                // https://docs.github.com/en/webhooks/webhook-events-and-payloads?actionType=opened#pull_request
                 let pr_number = payload["number"]
                     .as_u64()
                     .ok_or(DrahtBotError::KeyNotFound)?;

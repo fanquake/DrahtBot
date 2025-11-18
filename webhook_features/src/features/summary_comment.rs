@@ -69,7 +69,7 @@ impl Feature for SummaryCommentFeature {
         );
         match event {
             GitHubEvent::PullRequest if action == "synchronize" || action == "opened" => {
-                // https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
+                // https://docs.github.com/en/webhooks/webhook-events-and-payloads?actionType=opened#pull_request
                 let pr_number = payload["number"]
                     .as_u64()
                     .ok_or(DrahtBotError::KeyNotFound)?;
@@ -80,7 +80,7 @@ impl Feature for SummaryCommentFeature {
                 refresh_summary_comment(ctx, repo, pr_number, Some(diff_url)).await?
             }
             GitHubEvent::IssueComment if payload["issue"].get("pull_request").is_some() => {
-                // https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#issue_comment
+                // https://docs.github.com/en/webhooks/webhook-events-and-payloads?actionType=created#issue_comment
                 let comment_author = payload["comment"]["user"]["login"]
                     .as_str()
                     .ok_or(DrahtBotError::KeyNotFound)?;
@@ -97,7 +97,7 @@ impl Feature for SummaryCommentFeature {
                 }
             }
             GitHubEvent::PullRequestReview => {
-                // https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request_review
+                // https://docs.github.com/en/webhooks/webhook-events-and-payloads?actionType=submitted#pull_request_review
                 let pr_number = payload["pull_request"]["number"]
                     .as_u64()
                     .ok_or(DrahtBotError::KeyNotFound)?;

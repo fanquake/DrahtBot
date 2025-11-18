@@ -62,7 +62,7 @@ impl Feature for CiStatusFeature {
         }
         match event {
             GitHubEvent::CheckSuite if action == "completed" => {
-                // https://docs.github.com/webhooks-and-events/webhooks/webhook-events-and-payloads#check_suite
+                // https://docs.github.com/en/webhooks/webhook-events-and-payloads?actionType=completed#check_suite
                 let conclusion = payload["check_suite"]["conclusion"]
                     .as_str()
                     .ok_or(DrahtBotError::KeyNotFound)?;
