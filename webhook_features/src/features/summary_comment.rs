@@ -225,22 +225,15 @@ For details see: https://corecheck.dev/{owner}/{repo}/pulls/{pull_num}.
     if let Some(url) = llm_diff_pr {
         let mut text = "".to_string();
         match get_llm_check(&url, &ctx.llm_token).await {
-            Ok(reply) => {
-                if reply.contains("No typos were found") {
+            Ok(issues) => {
+                if issues.is_empty() {
                     // text remains empty
                 } else {
-                    let section = r#"
-### LLM Linter (✨ experimental)
-
-Possible typos and grammar issues:
-
-{llm_reply}
-
-<sup>{d_id}</sup>
-"#;
-                    text = section
-                        .replace("{llm_reply}", &reply)
-                        .replace("{d_id}", &chrono::Utc::now().format("%F").to_string());
+                    text = format!(
+                        "\n### LLM Linter (✨ experimental)\n\n{issues}\n\n<sup>{date}</sup>\n",
+                        issues = issues.join("\n"),
+                        date = chrono::Utc::now().format("%F")
+                    );
                 }
             }
             Err(err) => {
@@ -491,7 +484,7 @@ fn parse_review(comment: &str) -> Option<AckCommit> {
     None
 }
 
-async fn get_llm_check(llm_diff_pr: &str, llm_token: &str) -> Result<String> {
+async fn get_llm_check(llm_diff_pr: &str, llm_token: &str) -> Result<Vec<String>> {
     let client = reqwest::Client::new();
     println!(" ... Run LLM check.");
     let diff = client.get(llm_diff_pr).send().await?.text().await?;
@@ -516,7 +509,16 @@ async fn get_llm_check(llm_diff_pr: &str, llm_token: &str) -> Result<String> {
         println!("ERROR: empty llm response: {response}");
         return Err(DrahtBotError::KeyNotFound.into());
     }
-    Ok(text)
+    if text.contains("No typos were found") {
+        Ok(vec![])
+    } else {
+        let issue = format!(
+            "\n\n{topic}\n\n{text}\n\n",
+            topic = "Possible typos and grammar issues:",
+            text = text,
+        );
+        Ok(vec![issue])
+    }
 }
 
 // Test that parse_review works
