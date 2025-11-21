@@ -495,18 +495,7 @@ async fn get_llm_check(llm_diff_pr: &str, llm_token: &str) -> Result<String> {
     println!(" ... Run LLM check.");
     let diff = client.get(llm_diff_pr).send().await?.text().await?;
 
-    let diff = diff
-        .lines()
-        .filter(|line| !line.starts_with('-')) // Drop needless lines to avoid confusion and reduce token use
-        .map(|line| {
-            if line.starts_with('@') {
-                "@@ (hunk header) @@" // Rewrite hunk header to avoid typos in hunk header truncated by git
-            } else {
-                line
-            }
-        })
-        .collect::<Vec<_>>()
-        .join("\n");
+    let diff = util::prepare_raw_diff_for_llm(&diff);
 
     let payload = serde_json::json!({
       "model": "gpt-5-mini",

@@ -98,6 +98,21 @@ pub fn chdir(p: &std::path::Path) {
     std::env::set_current_dir(p).expect("chdir error")
 }
 
+/// Normalize a git diff for LLM consumption by dropping removed lines and rewriting hunk headers.
+pub fn prepare_raw_diff_for_llm(diff: &str) -> String {
+    diff.lines()
+        .filter(|line| !line.starts_with('-')) // Drop needless lines to avoid confusion and reduce token use
+        .map(|line| {
+            if line.starts_with('@') {
+                "@@ (hunk header) @@" // Rewrite hunk header to avoid typos in hunk header truncated by git
+            } else {
+                line
+            }
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
 #[cfg(feature = "github")]
 pub struct MetaComment {
     pull_num: u64,

@@ -3,6 +3,7 @@ use std::fs;
 use std::hash::{BuildHasher, Hasher, RandomState};
 use std::path::Path;
 use std::process::Command;
+use util::prepare_raw_diff_for_llm;
 
 #[derive(Parser)]
 #[command(about = "Scratch script to evaluate LLMs.", long_about = None)]
@@ -46,19 +47,12 @@ fn main() {
             .to_string();
         let diff = fs::read_to_string(entry.path()).expect("Must be able to read diff");
 
-        let diff = format!("{}\n", RandomState::new().build_hasher().finish()) // Inject seed to avoid cached input
-            + &diff
-                .lines()
-                .filter(|line| !line.starts_with('-')) // Drop needless lines to avoid confusion and reduce token use
-                .map(|line| {
-                    if line.starts_with('@') {
-                        "@@ (hunk header) @@" // Rewrite hunk header to avoid typos in hunk header truncated by git
-                    } else {
-                        line
-                    }
-                })
-                .collect::<Vec<_>>()
-                .join("\n");
+        let diff = format!(
+            "{}\n{}",
+            // Inject seed to avoid cached input
+            RandomState::new().build_hasher().finish(),
+            prepare_raw_diff_for_llm(&diff)
+        );
 
         check_google_ai(&cli, &outputs, &file_name, &diff);
         check_open_ai(&cli, &outputs, &file_name, &diff);
