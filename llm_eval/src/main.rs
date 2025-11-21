@@ -3,7 +3,7 @@ use std::fs;
 use std::hash::{BuildHasher, Hasher, RandomState};
 use std::path::Path;
 use std::process::Command;
-use util::{LLM_PROMPT_TYPOS, prepare_raw_diff_for_llm};
+use util::{LLM_PROMPT_TYPOS, LLM_SHARED_PROMPT_DIFF, prepare_raw_diff_for_llm};
 
 #[derive(Parser)]
 #[command(about = "Scratch script to evaluate LLMs.", long_about = None)]
@@ -65,7 +65,7 @@ fn check_google_ai(cli: &Cli, outputs: &Path, file_name: &str, diff: &str) {
       "systemInstruction": {
          "parts": [
            {
-               "text":LLM_PROMPT_TYPOS
+               "text":LLM_SHARED_PROMPT_DIFF
            },
          ]
        },
@@ -74,6 +74,13 @@ fn check_google_ai(cli: &Cli, outputs: &Path, file_name: &str, diff: &str) {
           "parts": [
             {
               "text": diff
+            }
+          ]
+        },
+        {
+          "parts": [
+            {
+              "text": LLM_PROMPT_TYPOS
             }
           ]
         }
@@ -131,7 +138,7 @@ fn check_open_ai(cli: &Cli, outputs: &Path, file_name: &str, diff: &str) {
           "content": [
             {
               "type": "text",
-              "text":LLM_PROMPT_TYPOS
+              "text": LLM_SHARED_PROMPT_DIFF
             }
           ]
         },
@@ -140,8 +147,12 @@ fn check_open_ai(cli: &Cli, outputs: &Path, file_name: &str, diff: &str) {
           "content": [
             {
               "type": "text",
-              "text":diff
-              }
+              "text": diff
+            },
+            {
+              "type": "text",
+              "text": LLM_PROMPT_TYPOS
+            }
           ]
         }
       ],

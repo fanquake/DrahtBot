@@ -8,7 +8,7 @@ use crate::GitHubEvent;
 use async_trait::async_trait;
 use lazy_static::lazy_static;
 use regex::Regex;
-use util::LLM_PROMPT_TYPOS;
+use util::{LLM_PROMPT_TYPOS, LLM_SHARED_PROMPT_DIFF};
 
 pub struct SummaryCommentFeature {
     meta: FeatureMeta,
@@ -506,7 +506,7 @@ async fn get_llm_check(llm_diff_pr: &str, llm_token: &str) -> Result<String> {
           "content": [
             {
               "type": "text",
-              "text":LLM_PROMPT_TYPOS
+              "text": LLM_SHARED_PROMPT_DIFF
             }
           ]
         },
@@ -515,8 +515,12 @@ async fn get_llm_check(llm_diff_pr: &str, llm_token: &str) -> Result<String> {
           "content": [
             {
               "type": "text",
-              "text":diff
-              }
+              "text": diff
+            },
+            {
+              "type": "text",
+              "text": LLM_PROMPT_TYPOS
+            }
           ]
         }
       ],

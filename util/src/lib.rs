@@ -113,6 +113,14 @@ pub fn prepare_raw_diff_for_llm(diff: &str) -> String {
         .join("\n")
 }
 
+/// Shared prompt that tells the LLM it will be given a git diff before receiving instructions.
+pub const LLM_SHARED_PROMPT_DIFF: &str = r#"
+Examine the provided git diff. Wait for additional instructions regarding how to evaluate or process the diff.
+
+- Upon receiving further instructions, carefully read and interpret the git diff according to the provided evaluation criteria.
+- Use the format or structure requested in follow-up instructions.
+"#;
+
 /// Shared prompt encouraging the LLM to highlight typos in git diff documentation.
 pub const LLM_PROMPT_TYPOS: &str = r#"
 Identify and provide feedback on typographic or grammatical errors in the provided git diff comments or documentation, focusing exclusively on errors impacting comprehension.
