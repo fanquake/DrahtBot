@@ -514,7 +514,7 @@ async fn get_llm_check(llm_diff_pr: &str, llm_token: &str) -> Result<String> {
         .to_string();
     if text.is_empty() {
         println!("ERROR: empty llm response: {response}");
-        text = "No typos were found".to_string();
+        return Err(DrahtBotError::KeyNotFound.into());
     }
     Ok(text)
 }
