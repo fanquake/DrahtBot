@@ -3,7 +3,7 @@ use std::fs;
 use std::hash::{BuildHasher, Hasher, RandomState};
 use std::path::Path;
 use std::process::Command;
-use util::prepare_raw_diff_for_llm;
+use util::{LLM_PROMPT_TYPOS, prepare_raw_diff_for_llm};
 
 #[derive(Parser)]
 #[command(about = "Scratch script to evaluate LLMs.", long_about = None)]
@@ -59,30 +59,13 @@ fn main() {
     }
 }
 
-const SYS_PROMPT: &str = r#"
-Identify and provide feedback on typographic or grammatical errors in the provided git diff comments or documentation, focusing exclusively on errors impacting comprehension.
-
-- Only address errors that make the English text invalid or incomprehensible.
-- Ignore style preferences, such as the Oxford comma, missing or superfluous commas, awkward but harmless language, and missing or inconsistent punctuation.
-- Focus solely on lines added (starting with a + in the diff).
-- Address only code comments (for example C++ or Python comments) or documentation (for example markdown).
-- If no errors are found, state that no typos were found.
-
-# Output Format
-
-List each error with minimal context, followed by a very brief rationale:
-- typo -> replacement [explanation]
-
-If none are found, state: "No typos were found".
-"#;
-
 fn check_google_ai(cli: &Cli, outputs: &Path, file_name: &str, diff: &str) {
     println!("Check {file_name} via google_ai");
     let payload = serde_json::json!({
       "systemInstruction": {
          "parts": [
            {
-               "text":SYS_PROMPT
+               "text":LLM_PROMPT_TYPOS
            },
          ]
        },
@@ -148,8 +131,8 @@ fn check_open_ai(cli: &Cli, outputs: &Path, file_name: &str, diff: &str) {
           "content": [
             {
               "type": "text",
-              "text":SYS_PROMPT
-    }
+              "text":LLM_PROMPT_TYPOS
+            }
           ]
         },
         {
