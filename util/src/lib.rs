@@ -139,6 +139,43 @@ List each error with minimal context, followed by a very brief rationale:
 If none are found, state: "No typos were found".
 "#;
 
+/// Construct the OpenAI chat payload used by llm clients that request diff checks.
+pub fn make_llm_payload(diff: &str, typo_prompt: &str) -> serde_json::Value {
+    serde_json::json!({
+      "model": "gpt-5-mini",
+      "messages": [
+        {
+          "role": "developer",
+          "content": [
+            {
+              "type": "text",
+              "text": LLM_SHARED_PROMPT_DIFF
+            }
+          ]
+        },
+        {
+          "role": "user",
+          "content": [
+            {
+              "type": "text",
+              "text": diff
+            },
+            {
+              "type": "text",
+              "text": typo_prompt
+            }
+          ]
+        }
+      ],
+      "response_format": {
+        "type": "text"
+      },
+      "reasoning_effort": "low",
+      "service_tier": "default",
+      "store": true
+    })
+}
+
 #[cfg(feature = "github")]
 pub struct MetaComment {
     pull_num: u64,

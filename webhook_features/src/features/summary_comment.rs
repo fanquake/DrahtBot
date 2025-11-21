@@ -8,7 +8,7 @@ use crate::GitHubEvent;
 use async_trait::async_trait;
 use lazy_static::lazy_static;
 use regex::Regex;
-use util::{LLM_PROMPT_TYPOS, LLM_SHARED_PROMPT_DIFF};
+use util::{make_llm_payload, LLM_PROMPT_TYPOS};
 
 pub struct SummaryCommentFeature {
     meta: FeatureMeta,
@@ -498,39 +498,7 @@ async fn get_llm_check(llm_diff_pr: &str, llm_token: &str) -> Result<String> {
 
     let diff = util::prepare_raw_diff_for_llm(&diff);
 
-    let payload = serde_json::json!({
-      "model": "gpt-5-mini",
-      "messages": [
-        {
-          "role": "developer",
-          "content": [
-            {
-              "type": "text",
-              "text": LLM_SHARED_PROMPT_DIFF
-            }
-          ]
-        },
-        {
-          "role": "user",
-          "content": [
-            {
-              "type": "text",
-              "text": diff
-            },
-            {
-              "type": "text",
-              "text": LLM_PROMPT_TYPOS
-            }
-          ]
-        }
-      ],
-      "response_format": {
-        "type": "text"
-      },
-      "reasoning_effort": "low",
-      "service_tier": "default",
-      "store": true
-    });
+    let payload = make_llm_payload(&diff, LLM_PROMPT_TYPOS);
     let response = client
         .post("https://api.openai.com/v1/chat/completions")
         .header("Authorization", format!("Bearer {}", llm_token))

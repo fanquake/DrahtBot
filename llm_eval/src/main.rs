@@ -3,7 +3,7 @@ use std::fs;
 use std::hash::{BuildHasher, Hasher, RandomState};
 use std::path::Path;
 use std::process::Command;
-use util::{LLM_PROMPT_TYPOS, LLM_SHARED_PROMPT_DIFF, prepare_raw_diff_for_llm};
+use util::{LLM_PROMPT_TYPOS, LLM_SHARED_PROMPT_DIFF, make_llm_payload, prepare_raw_diff_for_llm};
 
 #[derive(Parser)]
 #[command(about = "Scratch script to evaluate LLMs.", long_about = None)]
@@ -130,39 +130,7 @@ fn check_google_ai(cli: &Cli, outputs: &Path, file_name: &str, diff: &str) {
 
 fn check_open_ai(cli: &Cli, outputs: &Path, file_name: &str, diff: &str) {
     println!("Check {file_name} via open_ai");
-    let payload = serde_json::json!({
-      "model": "gpt-5-mini",
-      "messages": [
-        {
-          "role": "developer",
-          "content": [
-            {
-              "type": "text",
-              "text": LLM_SHARED_PROMPT_DIFF
-            }
-          ]
-        },
-        {
-          "role": "user",
-          "content": [
-            {
-              "type": "text",
-              "text": diff
-            },
-            {
-              "type": "text",
-              "text": LLM_PROMPT_TYPOS
-            }
-          ]
-        }
-      ],
-      "response_format": {
-        "type": "text"
-      },
-      "reasoning_effort": "low",
-      "service_tier": "flex",
-      "store": true
-    });
+    let payload = make_llm_payload(diff, LLM_PROMPT_TYPOS);
     let temp = outputs
         .join("temp_scratch")
         .to_str()
