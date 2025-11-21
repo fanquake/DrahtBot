@@ -139,6 +139,19 @@ List each error with minimal context, followed by a very brief rationale:
 If none are found, state: "No typos were found".
 "#;
 
+#[derive(Clone, Copy)]
+pub struct LlmCheck {
+    pub prompt: &'static str,
+    pub magic_all_good: &'static str,
+    pub topic: &'static str,
+}
+
+pub static LLM_TYPOS: LlmCheck = LlmCheck {
+    prompt: LLM_PROMPT_TYPOS,
+    magic_all_good: "No typos were found",
+    topic: "Possible typos and grammar issues:",
+};
+
 /// Construct the OpenAI chat payload used by llm clients that request diff checks.
 pub fn make_llm_payload(diff: &str, typo_prompt: &str) -> serde_json::Value {
     serde_json::json!({

@@ -8,7 +8,7 @@ use crate::GitHubEvent;
 use async_trait::async_trait;
 use lazy_static::lazy_static;
 use regex::Regex;
-use util::{make_llm_payload, LLM_PROMPT_TYPOS};
+use util::{make_llm_payload, LLM_TYPOS};
 
 pub struct SummaryCommentFeature {
     meta: FeatureMeta,
@@ -491,7 +491,8 @@ async fn get_llm_check(llm_diff_pr: &str, llm_token: &str) -> Result<Vec<String>
 
     let diff = util::prepare_raw_diff_for_llm(&diff);
 
-    let payload = make_llm_payload(&diff, LLM_PROMPT_TYPOS);
+    let llm_typos = LLM_TYPOS;
+    let payload = make_llm_payload(&diff, llm_typos.prompt);
     let response = client
         .post("https://api.openai.com/v1/chat/completions")
         .header("Authorization", format!("Bearer {}", llm_token))
@@ -509,12 +510,12 @@ async fn get_llm_check(llm_diff_pr: &str, llm_token: &str) -> Result<Vec<String>
         println!("ERROR: empty llm response: {response}");
         return Err(DrahtBotError::KeyNotFound.into());
     }
-    if text.contains("No typos were found") {
+    if text.contains(llm_typos.magic_all_good) {
         Ok(vec![])
     } else {
         let issue = format!(
             "\n\n{topic}\n\n{text}\n\n",
-            topic = "Possible typos and grammar issues:",
+            topic = llm_typos.topic,
             text = text,
         );
         Ok(vec![issue])
