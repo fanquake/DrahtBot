@@ -121,7 +121,14 @@ Examine the provided git diff. Wait for additional instructions regarding how to
 - Use the format or structure requested in follow-up instructions.
 "#;
 
-/// Shared prompt encouraging the LLM to highlight typos in git diff documentation.
+#[derive(Clone, Copy)]
+pub struct LlmCheck {
+    pub prompt: &'static str,
+    pub magic_all_good: &'static str,
+    pub topic: &'static str,
+}
+
+/// Prompt encouraging the LLM to highlight typos in git diff documentation.
 pub const LLM_PROMPT_TYPOS: &str = r#"
 Identify and provide feedback on typographic or grammatical errors in the provided git diff comments or documentation, focusing exclusively on errors impacting comprehension.
 
@@ -139,17 +146,40 @@ List each error with minimal context, followed by a very brief rationale:
 If none are found, state: "No typos were found".
 "#;
 
-#[derive(Clone, Copy)]
-pub struct LlmCheck {
-    pub prompt: &'static str,
-    pub magic_all_good: &'static str,
-    pub topic: &'static str,
-}
+/// Prompt encouraging the LLM to highlight missing named args in git diff.
+pub const LLM_PROMPT_NAMED_ARGS: &str = r#"
+Check C++ and Python code in the provided git diff for function calls where integral literal values (e.g., 0, true) are used as arguments. Recommend using named arguments—C++ style /*name=*/value or Python keyword=value—for such literals, and explain why this improves code clarity, safety, and maintainability.
+
+- Focus solely on lines added (starting with a + in the diff).
+- In C++: Look for function calls with literals as positional arguments. Recommend replacing `func(x, 0)` with `func(x, /*name=*/0)`. Analyze if the name makes the argument more readable or less error-prone.
+- In Python: Look for function calls with literals as positional arguments. Recommend replacing `func(x, 0)` with `func(x, position=0)` if the argument is not already named. (Do not recommend for arguments already using keyword syntax.)
+- Provide explanations based on:
+  - Improved readability and documentation
+  - Reduced risk of misordered or misunderstood arguments
+  - Easier code reviews and future-proofing, especially when there are several literal values
+- Do not flag or suggest changes for arguments that are already named or where such a comment would be more confusing.
+- Limit findings and suggestions to literals (do not suggest for variables or expressions).
+- If no opportunities are found, say that no suggestions were found.
+
+# Output Format
+
+List each suggestion with minimal context:
+
+- [function_call] in [C++/Python]
+
+If none are found, state: "No suggestions were found".
+"#;
 
 pub static LLM_TYPOS: LlmCheck = LlmCheck {
     prompt: LLM_PROMPT_TYPOS,
     magic_all_good: "No typos were found",
     topic: "Possible typos and grammar issues:",
+};
+
+pub static LLM_NAMED_ARGS: LlmCheck = LlmCheck {
+    prompt: LLM_PROMPT_NAMED_ARGS,
+    magic_all_good: "No suggestions were found",
+    topic: "Possible places where named args may be used:",
 };
 
 /// Construct the OpenAI chat payload used by llm clients that request diff checks.
