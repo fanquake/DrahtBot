@@ -1384,6 +1384,7 @@ version = "0.1.0"
 dependencies = [
  "futures",
  "octocrab",
+ "serde_json",
 ]
 
 [[package]]
