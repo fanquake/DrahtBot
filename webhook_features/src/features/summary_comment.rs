@@ -236,11 +236,11 @@ Possible typos and grammar issues:
 
 {llm_reply}
 
-<sup>drahtbot_id_{d_id}</sup>
+<sup>{d_id}</sup>
 "#;
                     text = section
                         .replace("{llm_reply}", &reply)
-                        .replace("{d_id}", "5_m");
+                        .replace("{d_id}", &chrono::Utc::now().format("%F").to_string());
                 }
             }
             Err(err) => {
@@ -508,7 +508,7 @@ async fn get_llm_check(llm_diff_pr: &str, llm_token: &str) -> Result<String> {
         .await?
         .json::<serde_json::Value>()
         .await?;
-    let mut text = response["choices"][0]["message"]["content"]
+    let text = response["choices"][0]["message"]["content"]
         .as_str()
         .ok_or(DrahtBotError::KeyNotFound)?
         .to_string();
