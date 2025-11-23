@@ -8,7 +8,7 @@ use crate::GitHubEvent;
 use async_trait::async_trait;
 use lazy_static::lazy_static;
 use regex::Regex;
-use util::{make_llm_payload, LLM_TYPOS};
+use util::{make_llm_payload, LLM_NAMED_ARGS, LLM_TYPOS};
 
 pub struct SummaryCommentFeature {
     meta: FeatureMeta,
@@ -490,36 +490,39 @@ async fn get_llm_check(llm_diff_pr: &str, llm_token: &str) -> Result<Vec<String>
     let diff = client.get(llm_diff_pr).send().await?.text().await?;
 
     let diff = util::prepare_raw_diff_for_llm(&diff);
+    let mut issues = Vec::new();
 
-    let llm_typos = LLM_TYPOS;
-    let payload = make_llm_payload(&diff, llm_typos.prompt);
-    let response = client
-        .post("https://api.openai.com/v1/chat/completions")
-        .header("Authorization", format!("Bearer {}", llm_token))
-        .header("Content-Type", "application/json")
-        .json(&payload)
-        .send()
-        .await?
-        .json::<serde_json::Value>()
-        .await?;
-    let text = response["choices"][0]["message"]["content"]
-        .as_str()
-        .ok_or(DrahtBotError::KeyNotFound)?
-        .to_string();
-    if text.is_empty() {
-        println!("ERROR: empty llm response: {response}");
-        return Err(DrahtBotError::KeyNotFound.into());
-    }
-    if text.contains(llm_typos.magic_all_good) {
-        Ok(vec![])
-    } else {
+    for llm_check in [LLM_TYPOS, LLM_NAMED_ARGS] {
+        let payload = make_llm_payload(&diff, llm_check.prompt);
+        let response = client
+            .post("https://api.openai.com/v1/chat/completions")
+            .header("Authorization", format!("Bearer {}", llm_token))
+            .header("Content-Type", "application/json")
+            .json(&payload)
+            .send()
+            .await?
+            .json::<serde_json::Value>()
+            .await?;
+        let text = response["choices"][0]["message"]["content"]
+            .as_str()
+            .ok_or(DrahtBotError::KeyNotFound)?
+            .to_string();
+        if text.is_empty() {
+            println!("ERROR: empty llm response: {response}");
+            return Err(DrahtBotError::KeyNotFound.into());
+        }
+        if text.contains(llm_check.magic_all_good) {
+            continue;
+        }
         let issue = format!(
             "\n\n{topic}\n\n{text}\n\n",
-            topic = llm_typos.topic,
+            topic = llm_check.topic,
             text = text,
         );
-        Ok(vec![issue])
+        issues.push(issue);
     }
+
+    Ok(issues)
 }
 
 // Test that parse_review works
