@@ -158,7 +158,8 @@ Check C++ and Python code in the provided git diff for function calls where inte
   - Reduced risk of misordered or misunderstood arguments
   - Easier code reviews and future-proofing, especially when there are several literal values
 - Do not flag or suggest changes for arguments that are already named or where such a comment would be more confusing.
-- Do not flag the first argument of a function call. Only flag the second and later arguments.
+- Do not flag the first two argument of a function call. Only flag the third and later arguments.
+- Do not flag string literals.
 - Limit findings and suggestions to literals (do not suggest for variables or expressions).
 - If no opportunities are found, say that no suggestions were found.
 
