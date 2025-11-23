@@ -151,9 +151,9 @@ pub const LLM_PROMPT_NAMED_ARGS: &str = r#"
 Check C++ and Python code in the provided git diff for function calls where integral literal values (e.g., 0, true) are used as arguments. Recommend using named arguments—C++ style /*name=*/value or Python keyword=value—for such literals, and explain why this improves code clarity, safety, and maintainability.
 
 - Focus solely on lines added (starting with a + in the diff).
-- In C++: Look for function calls with literals as positional arguments. Recommend replacing `func(x, 0)` with `func(x, /*name=*/0)`. Analyze if the name makes the argument more readable or less error-prone.
-- In Python: Look for function calls with literals as positional arguments. Recommend replacing `func(x, 0)` with `func(x, position=0)` if the argument is not already named. (Do not recommend for arguments already using keyword syntax.)
-- Provide explanations based on:
+- In C++: Look for function calls with literals as positional arguments. Recommend replacing `func(x, 0)` with `func(x, /*named_arg=*/0)`.
+- In Python: Look for function calls with literals as positional arguments. Recommend replacing `func(x, 0)` with `func(x, named_arg=0)` if the argument is not already named or is already using keyword syntax.
+- Only suggest if there are benefits, such as:
   - Improved readability and documentation
   - Reduced risk of misordered or misunderstood arguments
   - Easier code reviews and future-proofing, especially when there are several literal values
@@ -163,9 +163,9 @@ Check C++ and Python code in the provided git diff for function calls where inte
 
 # Output Format
 
-List each suggestion with minimal context:
+List each location with minimal context. Only list the location, and do not suggest an arg name for the keyword:
 
-- [function_call] in [C++/Python]
+- [function_call_signature] in [filename]
 
 If none are found, state: "No suggestions were found".
 "#;
