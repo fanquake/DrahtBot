@@ -148,7 +148,7 @@ If none are found, state: "No typos were found".
 
 /// Prompt encouraging the LLM to highlight missing named args in git diff.
 pub const LLM_PROMPT_NAMED_ARGS: &str = r#"
-Check C++ and Python code in the provided git diff for function calls where integral literal values (e.g., 0, true) are used as arguments. Recommend using named arguments—C++ style /*name=*/value or Python keyword=value—for such literals, and explain why this improves code clarity, safety, and maintainability.
+Check C++ and Python code in the provided git diff for function calls where integral literal values (e.g., 0, true) are used as arguments.
 
 - Focus solely on lines added (starting with a + in the diff).
 - In C++: Look for function calls with literals as positional arguments. Recommend replacing `func(x, 0)` with `func(x, /*named_arg=*/0)`.
@@ -158,6 +158,7 @@ Check C++ and Python code in the provided git diff for function calls where inte
   - Reduced risk of misordered or misunderstood arguments
   - Easier code reviews and future-proofing, especially when there are several literal values
 - Do not flag or suggest changes for arguments that are already named or where such a comment would be more confusing.
+- Do not flag the first argument of a function call. Only flag the second and later arguments.
 - Limit findings and suggestions to literals (do not suggest for variables or expressions).
 - If no opportunities are found, say that no suggestions were found.
 
