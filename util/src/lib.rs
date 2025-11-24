@@ -181,7 +181,7 @@ pub static LLM_TYPOS: LlmCheck = LlmCheck {
 pub static LLM_NAMED_ARGS: LlmCheck = LlmCheck {
     prompt: LLM_PROMPT_NAMED_ARGS,
     magic_all_good: "No suggestions were found",
-    topic: "Possible places where named args may be used:",
+    topic: "Possible places where named args may be used (e.g. `func(x, /*named_arg=*/0)` in C++, and `func(x, named_arg=0)` in Python):",
 };
 
 /// Construct the OpenAI chat payload used by llm clients that request diff checks.
