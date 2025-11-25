@@ -167,9 +167,9 @@ See [the guideline]({review_url}) for information on the review process.
         }
 
         comment += "\n";
-        comment += "If your review is incorrectly listed, please copy-paste `";
-        comment += BOT_SKIP_TAG;
-        comment += "` into the comment that the bot should ignore.";
+        comment += "If your review is incorrectly listed, please copy-paste ";
+        comment += "<code>&lt;!--meta-tag:bot-skip--&gt;</code>" /* BOT_SKIP_TAG */;
+        comment += " into the comment that the bot should ignore.";
         comment += "\n";
     }
 
