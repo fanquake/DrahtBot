@@ -116,6 +116,8 @@ impl Feature for SummaryCommentFeature {
     }
 }
 
+const BOT_SKIP_TAG: &str = "<!--meta-tag:bot-skip-->";
+
 fn summary_comment_template(reviews: Vec<Review>) -> String {
     let review_url = "https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md#code-review";
     let mut comment = format!(
@@ -165,7 +167,9 @@ See [the guideline]({review_url}) for information on the review process.
         }
 
         comment += "\n";
-        comment +="If your review is incorrectly listed, please react with 👎 to this comment and the bot will ignore it on the next update.";
+        comment += "If your review is incorrectly listed, please copy-paste `";
+        comment += BOT_SKIP_TAG;
+        comment += "` into the comment that the bot should ignore.";
         comment += "\n";
     }
 
@@ -251,21 +255,6 @@ For details see: https://corecheck.dev/{owner}/{repo}/pulls/{pull_num}.
         .await?;
     }
 
-    let ignored_users = if let Some(cmt_id) = cmt.id {
-        let reactions = ctx
-            .octocrab
-            .all_pages(issues_api.list_comment_reactions(cmt_id).send().await?)
-            .await?;
-
-        reactions
-            .into_iter()
-            .filter(|r| r.content == octocrab::models::reactions::ReactionContent::MinusOne)
-            .map(|r| r.user.login)
-            .collect::<Vec<_>>()
-    } else {
-        vec![]
-    };
-
     let mut all_comments = all_comments
         .into_iter()
         .filter(|c| cmt.id != Some(c.id))
@@ -312,7 +301,7 @@ For details see: https://corecheck.dev/{owner}/{repo}/pulls/{pull_num}.
             let has_current_head = ac.commit.is_some_and(|c| head_commit.starts_with(&c));
             v.push(Review {
                 user: comment.user.clone(),
-                ack_type: if ignored_users.contains(&comment.user) {
+                ack_type: if comment.body.contains(BOT_SKIP_TAG) {
                     AckType::Ignored
                 } else if ac.ack_type == AckType::Ack && !has_current_head {
                     AckType::StaleAck
