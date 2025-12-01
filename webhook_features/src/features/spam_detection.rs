@@ -223,6 +223,14 @@ NORMAL
 
 Example 2
 Input:
+title: Update ci.yml
+body: <!-- *** Please remove the following help text before submitting -->
+
+Output:
+SPAM. The submission contains only boilerplate contributor guidance and no actual description of the proposed change, rationale, tests, or implementation details. The title is generic and there is no substantive content to review, suggesting a placeholder/empty or irrelevant submission rather than a legitimate contribution.
+
+Example 3
+Input:
 title: AE917B4 COIN
 body: Please describe the feature you'd like to see added. AE917B4.COIN.LOGO.png (view on web)
 
