@@ -246,6 +246,10 @@ impl MetaComment {
     }
 
     fn update(&mut self, id: IdComment, new_text: &str) -> bool {
+        // TODO. Maybe check if new_text contains "<!--" and reject it as Err("Must not contain
+        // magic section split string").
+        // Also, could reword the magic section split string to `<!---` (with 3 dashes, to avoid
+        // normal use collisions?)
         let needle = id.str();
         let new_section = format!("{}{}", needle, new_text);
         for s in self.sections.iter_mut() {
