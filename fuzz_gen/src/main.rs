@@ -74,6 +74,7 @@ fn main() {
     for replacement in [
         r#"s/set_cover_merge=1/merge=1/g"#,
         r#"s/use_value_profile=0/use_value_profile=1/g"#,
+        r#"s|targets += \[(rpc_target, {"LIMIT_TO_RPC_COMMAND": r}) for r in lines\]|targets.remove(rpc_target)|g"#,
     ] {
         check_call(Command::new("sed").args(["-i", replacement, "test/fuzz/test_runner.py"]));
     }
