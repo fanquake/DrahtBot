@@ -154,12 +154,13 @@ Check C++ and Python code in the provided git diff for function calls where inte
 - In C++: Look for function calls with literals as positional arguments. Recommend replacing `func(x, 0)` with `func(x, /*named_arg=*/0)`.
 - In Python: Look for function calls with literals as positional arguments. Recommend replacing `func(x, 0)` with `func(x, named_arg=0)` if the argument is not already named or is already using keyword syntax.
 - Only suggest if there are benefits, such as:
-  - Improved readability and documentation
-  - Reduced risk of misordered or misunderstood arguments
+  - Improved readability and documentation, when the meaning of the literal is not obvious from the context
+  - Reduced risk of misordered or misunderstood arguments, when the order is not obvious from the context
   - Easier code reviews and future-proofing, especially when there are several literal values
 - Do not flag or suggest changes for arguments that are already named or where such a comment would be more confusing.
 - Do not flag the first two argument of a function call. Only flag the third and later arguments.
 - Do not flag string literals.
+- Do not flag cases where adding a name comment or keyword would be more confusing or noisy than helpful.
 - Limit findings and suggestions to literals (do not suggest for variables or expressions).
 - If no opportunities are found, say that no suggestions were found.
 
@@ -181,7 +182,7 @@ pub static LLM_TYPOS: LlmCheck = LlmCheck {
 pub static LLM_NAMED_ARGS: LlmCheck = LlmCheck {
     prompt: LLM_PROMPT_NAMED_ARGS,
     magic_all_good: "No suggestions were found",
-    topic: "Possible places where named args may be used (e.g. `func(x, /*named_arg=*/0)` in C++, and `func(x, named_arg=0)` in Python):",
+    topic: "Possible places where named args for integral literals may be used (e.g. `func(x, /*named_arg=*/0)` in C++, and `func(x, named_arg=0)` in Python):",
 };
 
 /// Construct the OpenAI chat payload used by llm clients that request diff checks.
