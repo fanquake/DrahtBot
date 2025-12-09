@@ -34,7 +34,9 @@ fn gen_coverage(
 
     docker_exec(&format!(
         "cmake -B {} \
-         -DWITH_ZMQ=ON -DWITH_BDB=ON -DWARN_INCOMPATIBLE_BDB=OFF \
+         --preset=dev-mode \
+         -DWITH_QRENCODE=OFF -DBUILD_GUI_TESTS=OFF -DBUILD_GUI=OFF -DWITH_USDT=OFF \
+         -DBUILD_FUZZ_BINARY=OFF -DBUILD_BENCH=OFF \
          -DCMAKE_C_COMPILER='gcc;-fprofile-update=atomic' \
          -DCMAKE_CXX_COMPILER='g++;-fprofile-update=atomic' \
          -DCMAKE_BUILD_TYPE=Coverage",
