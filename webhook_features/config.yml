@@ -88,10 +88,11 @@ repositories:
         - '^tool:'
         - '^tools:'
         - '^cli:'
+      Fuzzing:
+        - '^fuzz:'
       Tests:
         - '^lint:'
         - '^qa:'
-        - '^fuzz:'
         - '^tests?:'
         - '^ci:'
         - '^bench:'
