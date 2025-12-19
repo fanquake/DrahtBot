@@ -173,6 +173,24 @@ List each location with minimal context. Only list the location, and do not sugg
 If none are found, state: "No suggestions were found".
 "#;
 
+pub const LLM_PROMPT_EQUALITY_MACROS: &str = r#"
+Scan the provided git diff for test equality comparisons that rely on generic check macros or bare assertions comparing equality instead of using the equality-specific helpers.
+
+- Focus only on lines added (starting with a + in the diff).
+- In C++: Look for test macros such as `BOOST_CHECK`, `BOOST_REQUIRE`, or similar matchers that wrap an explicit equality comparison like `BOOST_CHECK(a == b)` or `BOOST_REQUIRE(a == b)`. Recommend using the equality-specific macros (`BOOST_CHECK_EQUAL`, `BOOST_REQUIRE_EQUAL`, etc.) because they provide clearer diagnostics for mismatched values.
+- Do not flag bare assert(...) equality checks that appear in fuzz targets or other test code that does not use a testing framework (for example fuzz/* or files containing FUZZ_TARGET). Only suggest replacing equality comparisons when the file is part of a unit-test using a test framework that provides equality helpers (e.g. Boost.Test).
+- In Python: Look for bare `assert a == b`. Recommend assert_equal.
+- Only flag instances where the equality intent is explicit and the specialized macro is clearly applicable to avoid noise.
+- If no changes are needed, state: "No equality macro suggestions were found."
+
+# Output Format
+
+List each location with a concise suggestion:
+- [filename] snippet -> recommendation
+
+If none are found, state: "No equality macro suggestions were found."
+"#;
+
 pub static LLM_TYPOS: LlmCheck = LlmCheck {
     prompt: LLM_PROMPT_TYPOS,
     magic_all_good: "No typos were found",
@@ -183,6 +201,12 @@ pub static LLM_NAMED_ARGS: LlmCheck = LlmCheck {
     prompt: LLM_PROMPT_NAMED_ARGS,
     magic_all_good: "No suggestions were found",
     topic: "Possible places where named args for integral literals may be used (e.g. `func(x, /*named_arg=*/0)` in C++, and `func(x, named_arg=0)` in Python):",
+};
+
+pub static LLM_EQUALITY_MACROS: LlmCheck = LlmCheck {
+    prompt: LLM_PROMPT_EQUALITY_MACROS,
+    magic_all_good: "No equality macro suggestions were found.",
+    topic: "Possible places where equality-specific test macros should replace generic comparisons:",
 };
 
 /// Construct the OpenAI chat payload used by llm clients that request diff checks.
