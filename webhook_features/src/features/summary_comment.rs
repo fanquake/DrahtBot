@@ -8,7 +8,7 @@ use crate::GitHubEvent;
 use async_trait::async_trait;
 use lazy_static::lazy_static;
 use regex::Regex;
-use util::{make_llm_payload, LLM_EQUALITY_MACROS, LLM_NAMED_ARGS, LLM_TYPOS};
+use util::{make_llm_payload, LLM_CMP_MACROS, LLM_NAMED_ARGS, LLM_TYPOS};
 
 pub struct SummaryCommentFeature {
     meta: FeatureMeta,
@@ -481,7 +481,7 @@ async fn get_llm_check(llm_diff_pr: &str, llm_token: &str) -> Result<Vec<String>
     let diff = util::prepare_raw_diff_for_llm(&diff);
     let mut issues = Vec::new();
 
-    for llm_check in [LLM_TYPOS, LLM_NAMED_ARGS, LLM_EQUALITY_MACROS] {
+    for llm_check in [LLM_TYPOS, LLM_NAMED_ARGS, LLM_CMP_MACROS] {
         let payload = make_llm_payload(&diff, llm_check.prompt);
         let response = client
             .post("https://api.openai.com/v1/chat/completions")

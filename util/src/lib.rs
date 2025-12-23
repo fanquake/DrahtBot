@@ -173,22 +173,38 @@ List each location with minimal context. Only list the location, and do not sugg
 If none are found, state: "No suggestions were found".
 "#;
 
-pub const LLM_PROMPT_EQUALITY_MACROS: &str = r#"
-Scan the provided git diff for test equality comparisons that rely on generic check macros or bare assertions comparing equality instead of using the equality-specific helpers.
+pub const LLM_PROMPT_CMP_MACROS: &str = r#"
+Scan the provided git diff for test comparisons that rely on generic check macros or bare assertions instead of using the comparison-specific helpers.
 
 - Focus only on lines added (starting with a + in the diff).
-- In C++: Look for test macros such as `BOOST_CHECK`, `BOOST_REQUIRE`, or similar matchers that wrap an explicit equality comparison like `BOOST_CHECK(a == b)` or `BOOST_REQUIRE(a == b)`. Recommend using the equality-specific macros (`BOOST_CHECK_EQUAL`, `BOOST_REQUIRE_EQUAL`, etc.) because they provide clearer diagnostics for mismatched values.
-- Do not flag bare assert(...) equality checks that appear in fuzz targets or other test code that does not use a testing framework (for example fuzz/* or files containing FUZZ_TARGET). Only suggest replacing equality comparisons when the file is part of a unit-test using a test framework that provides equality helpers (e.g. Boost.Test).
+- In C++ look for Boost.Test macros such as BOOST_CHECK, BOOST_REQUIRE, BOOST_WARN (or other BOOST_<level> macros) that wrap a direct comparison using built‑in operators (==, !=, <, <=, >, >=), for example:
+  * BOOST_CHECK(a == b)
+  * BOOST_REQUIRE(x < y)
+  * BOOST_WARN(result != expected)
+  When you find such cases, recommend using the corresponding comparison‑specific macros, which give clearer diagnostics:
+  * == → BOOST_<level>_EQUAL
+  * != → BOOST_<level>_NE
+  * < → BOOST_<level>_LT
+  * <= → BOOST_<level>_LE
+  * > → BOOST_<level>_GT
+  * >= → BOOST_<level>_GE
+- Do not flag bare assert(...) checks that appear in fuzz targets or other test code that does not use a testing framework (for example fuzz/* or files containing FUZZ_TARGET). Only suggest replacing comparisons when the file is part of a unit-test using a test framework that provides helpers (e.g. Boost.Test).
+- In Python, functional tests under test/functional/, look for bare assert statements using built‑in comparison operators where a helper is clearly more appropriate. Only the following helpers are available:
+  * assert a == b → assert_equal(a, b)
+  * assert a != b → assert_not_equal(a, b)
+  * assert a > b → assert_greater_than(a, b)
+  * assert a >= b → assert_greater_than_or_equal(a, b)
+  * assert abs(v - vexp) < 0.00001 → assert_approx(v, vexp, vspan=...)
 - In Python: Look for bare `assert a == b`. Recommend assert_equal.
-- Only flag instances where the equality intent is explicit and the specialized macro is clearly applicable to avoid noise.
-- If no changes are needed, state: "No equality macro suggestions were found."
+- Only flag instances where the intent is explicit and the specialized macro is clearly applicable to avoid noise.
+- If no changes are needed, state: "No comparison macro suggestions were found."
 
 # Output Format
 
 List each location with a concise suggestion:
 - [filename] snippet -> recommendation
 
-If none are found, state: "No equality macro suggestions were found."
+If none are found, state: "No comparison macro suggestions were found."
 "#;
 
 pub static LLM_TYPOS: LlmCheck = LlmCheck {
@@ -203,10 +219,10 @@ pub static LLM_NAMED_ARGS: LlmCheck = LlmCheck {
     topic: "Possible places where named args for integral literals may be used (e.g. `func(x, /*named_arg=*/0)` in C++, and `func(x, named_arg=0)` in Python):",
 };
 
-pub static LLM_EQUALITY_MACROS: LlmCheck = LlmCheck {
-    prompt: LLM_PROMPT_EQUALITY_MACROS,
-    magic_all_good: "No equality macro suggestions were found.",
-    topic: "Possible places where equality-specific test macros should replace generic comparisons:",
+pub static LLM_CMP_MACROS: LlmCheck = LlmCheck {
+    prompt: LLM_PROMPT_CMP_MACROS,
+    magic_all_good: "No comparison macro suggestions were found.",
+    topic: "Possible places where comparison-specific test macros should replace generic comparisons:",
 };
 
 /// Construct the OpenAI chat payload used by llm clients that request diff checks.
