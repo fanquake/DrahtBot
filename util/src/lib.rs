@@ -129,8 +129,8 @@ pub struct LlmCheck {
 }
 
 impl LlmCheck {
-    pub fn prompt(&self) -> &'static str {
-        self.prompt
+    pub fn prompt(&self) -> String {
+        self.prompt.replace("{magic_all_good}", self.magic_all_good)
     }
 }
 
@@ -142,14 +142,14 @@ Identify and provide feedback on typographic or grammatical errors in the provid
 - Ignore style preferences, such as the Oxford comma, missing or superfluous commas, awkward but harmless language, and missing or inconsistent punctuation.
 - Focus solely on lines added (starting with a + in the diff).
 - Address only code comments (for example C++ or Python comments) or documentation (for example markdown).
-- If no errors are found, state that no typos were found.
+- If no errors are found, say "{magic_all_good}".
 
 # Output Format
 
 List each error with minimal context, followed by a very brief rationale:
 - typo -> replacement [explanation]
 
-If none are found, state: "No typos were found".
+If none are found, state: "{magic_all_good}".
 "#;
 
 /// Prompt encouraging the LLM to highlight missing named args in git diff.
@@ -168,7 +168,7 @@ Check C++ and Python code in the provided git diff for function calls where inte
 - Do not flag string literals.
 - Do not flag cases where adding a name comment or keyword would be more confusing or noisy than helpful.
 - Limit findings and suggestions to literals (do not suggest for variables or expressions).
-- If no opportunities are found, say that no suggestions were found.
+- If no opportunities are found, say "{magic_all_good}".
 
 # Output Format
 
@@ -176,7 +176,7 @@ List each location with minimal context. Only list the location, and do not sugg
 
 - [function_call_signature] in [filename]
 
-If none are found, state: "No suggestions were found".
+If none are found, state: "{magic_all_good}".
 "#;
 
 pub const LLM_PROMPT_CMP_MACROS: &str = r#"
@@ -203,14 +203,14 @@ Scan the provided git diff for test comparisons that rely on generic check macro
   * assert abs(v - vexp) < 0.00001 → assert_approx(v, vexp, vspan=...)
 - In Python: Look for bare `assert a == b`. Recommend assert_equal.
 - Only flag instances where the intent is explicit and the specialized macro is clearly applicable to avoid noise.
-- If no changes are needed, state: "No comparison macro suggestions were found."
+- If no changes are needed, say "{magic_all_good}".
 
 # Output Format
 
 List each location with a concise suggestion:
 - [filename] snippet -> recommendation
 
-If none are found, state: "No comparison macro suggestions were found."
+If none are found, state: "{magic_all_good}".
 "#;
 
 pub static LLM_TYPOS: LlmCheck = LlmCheck {
@@ -237,7 +237,7 @@ pub fn all_llm_checks() -> Vec<LlmCheck> {
 }
 
 /// Construct the OpenAI chat payload used by llm clients that request diff checks.
-pub fn make_llm_payload(diff: &str, typo_prompt: &str) -> serde_json::Value {
+pub fn make_llm_payload(diff: &str, typo_prompt: String) -> serde_json::Value {
     serde_json::json!({
       "model": "gpt-5-mini",
       "messages": [
