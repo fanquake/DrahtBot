@@ -123,9 +123,15 @@ Examine the provided git diff. Wait for additional instructions regarding how to
 
 #[derive(Clone, Copy)]
 pub struct LlmCheck {
-    pub prompt: &'static str,
+    prompt: &'static str,
     pub magic_all_good: &'static str,
     pub topic: &'static str,
+}
+
+impl LlmCheck {
+    pub fn prompt(&self) -> &'static str {
+        self.prompt
+    }
 }
 
 /// Prompt encouraging the LLM to highlight typos in git diff documentation.
@@ -224,6 +230,11 @@ pub static LLM_CMP_MACROS: LlmCheck = LlmCheck {
     magic_all_good: "No comparison macro suggestions were found.",
     topic: "Possible places where comparison-specific test macros should replace generic comparisons:",
 };
+
+/// Return all available LLM lint checks
+pub fn all_llm_checks() -> Vec<LlmCheck> {
+    vec![LLM_TYPOS, LLM_NAMED_ARGS, LLM_CMP_MACROS]
+}
 
 /// Construct the OpenAI chat payload used by llm clients that request diff checks.
 pub fn make_llm_payload(diff: &str, typo_prompt: &str) -> serde_json::Value {

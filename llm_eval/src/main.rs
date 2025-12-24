@@ -3,7 +3,7 @@ use std::fs;
 use std::hash::{BuildHasher, Hasher, RandomState};
 use std::path::Path;
 use std::process::Command;
-use util::{LLM_PROMPT_TYPOS, LLM_SHARED_PROMPT_DIFF, make_llm_payload, prepare_raw_diff_for_llm};
+use util::{LLM_SHARED_PROMPT_DIFF, LLM_TYPOS, make_llm_payload, prepare_raw_diff_for_llm};
 
 #[derive(Parser)]
 #[command(about = "Scratch script to evaluate LLMs.", long_about = None)]
@@ -80,7 +80,7 @@ fn check_google_ai(cli: &Cli, outputs: &Path, file_name: &str, diff: &str) {
         {
           "parts": [
             {
-              "text": LLM_PROMPT_TYPOS
+              "text": LLM_TYPOS.prompt()
             }
           ]
         }
@@ -130,7 +130,7 @@ fn check_google_ai(cli: &Cli, outputs: &Path, file_name: &str, diff: &str) {
 
 fn check_open_ai(cli: &Cli, outputs: &Path, file_name: &str, diff: &str) {
     println!("Check {file_name} via open_ai");
-    let payload = make_llm_payload(diff, LLM_PROMPT_TYPOS);
+    let payload = make_llm_payload(diff, LLM_TYPOS.prompt());
     let temp = outputs
         .join("temp_scratch")
         .to_str()
