@@ -183,18 +183,7 @@ pub const LLM_PROMPT_CMP_MACROS: &str = r#"
 Scan the provided git diff for test comparisons that rely on generic check macros or bare assertions instead of using the comparison-specific helpers.
 
 - Focus only on lines added (starting with a + in the diff).
-- In C++ look for Boost.Test macros such as BOOST_CHECK, BOOST_REQUIRE, BOOST_WARN (or other BOOST_<level> macros) that wrap a direct comparison using built‑in operators (==, !=, <, <=, >, >=), for example:
-  * BOOST_CHECK(a == b)
-  * BOOST_REQUIRE(x < y)
-  * BOOST_WARN(result != expected)
-  When you find such cases, recommend using the corresponding comparison‑specific macros, which give clearer diagnostics:
-  * == → BOOST_<level>_EQUAL
-  * != → BOOST_<level>_NE
-  * < → BOOST_<level>_LT
-  * <= → BOOST_<level>_LE
-  * > → BOOST_<level>_GT
-  * >= → BOOST_<level>_GE
-- Do not flag bare assert(...) checks that appear in fuzz targets or other test code that does not use a testing framework (for example fuzz/* or files containing FUZZ_TARGET). Only suggest replacing comparisons when the file is part of a unit-test using a test framework that provides helpers (e.g. Boost.Test).
+- Do not flag any C++ code. Do not flag Boost.Test C++ code. Do not flag fuzz C++ code.
 - In Python, functional tests under test/functional/, look for bare assert statements using built‑in comparison operators where a helper is clearly more appropriate. Only the following helpers are available:
   * assert a == b → assert_equal(a, b)
   * assert a != b → assert_not_equal(a, b)
