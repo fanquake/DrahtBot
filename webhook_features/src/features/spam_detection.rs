@@ -343,6 +343,7 @@ async fn spam_pr_heuristic(
         || all_files
             .iter()
             .any(|f| f.filename.starts_with(".github") && f.status == DiffEntryStatus::Added)
+        || all_files.len() >= 15
     {
         let pull_request = pulls_api.get(pr_number).await?;
         if [FirstTimer, FirstTimeContributor, Mannequin, None]
