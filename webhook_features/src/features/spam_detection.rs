@@ -325,6 +325,12 @@ async fn spam_pr_heuristic(
             issues_api.create_comment(pr_number, text).await?;
         }
     }
+    let some_commits = pulls_api
+        .pr_commits(pr_number)
+        .per_page(9)
+        .send()
+        .await?
+        .items;
     if all_files.iter().any(|f| {
         let sw = |p| f.filename.starts_with(p);
         let ct = |p| f.filename.contains(p);
@@ -344,6 +350,10 @@ async fn spam_pr_heuristic(
             .iter()
             .any(|f| f.filename.starts_with(".github") && f.status == DiffEntryStatus::Added)
         || all_files.len() >= 15
+        || some_commits.iter().any(|c| {
+            let ct = |m| c.commit.message.contains(m);
+            ct("Claude ")
+        })
     {
         let pull_request = pulls_api.get(pr_number).await?;
         if [FirstTimer, FirstTimeContributor, Mannequin, None]
