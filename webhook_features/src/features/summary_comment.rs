@@ -430,10 +430,10 @@ impl AckType {
 
 lazy_static! {
     static ref ACK_PATTERNS: Vec<(Regex, AckType)> = vec![
-        (r"\b(Approach ACK)\b", AckType::ApproachAck),
-        (r"\b(Approach NACK)\b", AckType::ApproachNack),
+        (r"\b([Aa]pproach ACK)\b", AckType::ApproachAck),
+        (r"\b([Aa]pproach NACK)\b", AckType::ApproachNack),
         (r"\b(NACK)\b", AckType::ConceptNack),
-        (r"\b(Concept ACK)\b", AckType::ConceptAck),
+        (r"\b([Cc]oncept ACK)\b", AckType::ConceptAck),
         (r"(ACK)(?:.*?)([0-9a-f]{6,40})\b", AckType::Ack),
         (r"(ACK)\b", AckType::ConceptAck)
     ]
@@ -630,7 +630,21 @@ mod tests {
                 }),
             },
             TestCase {
+                comment: "Concept ACK, but approach NACK",
+                expected: Some(AckCommit {
+                    ack_type: AckType::ApproachNack,
+                    commit: None,
+                }),
+            },
+            TestCase {
                 comment: "Concept NACK",
+                expected: Some(AckCommit {
+                    ack_type: AckType::ConceptNack,
+                    commit: None,
+                }),
+            },
+            TestCase {
+                comment: "concept NACK",
                 expected: Some(AckCommit {
                     ack_type: AckType::ConceptNack,
                     commit: None,
@@ -648,7 +662,7 @@ mod tests {
                 expected: None,
             },
             TestCase {
-                comment: "This is a Concept ACK for me!",
+                comment: "This is a concept ACK for me!",
                 expected: Some(
                     AckCommit {
                         ack_type: AckType::ConceptAck,
