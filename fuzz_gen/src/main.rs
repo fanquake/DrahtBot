@@ -111,7 +111,7 @@ fn main() {
         .args([
             "./bld/test/fuzz/test_runner.py",
             "-l=DEBUG",
-            "--exclude=rpc",
+            // "--exclude=rpc",
         ])
         .arg(format!("--par={}", args.jobs));
         cmd
