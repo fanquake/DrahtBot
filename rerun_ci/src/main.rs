@@ -1,7 +1,5 @@
 use clap::Parser;
 use octocrab::params::repos::Commitish;
-use std::collections::hash_map::RandomState;
-use std::hash::{BuildHasher, Hasher};
 
 #[derive(clap::Parser)]
 #[command(about = "Trigger GHA CI to re-run.", long_about = None)]
@@ -65,23 +63,15 @@ async fn main() -> octocrab::Result<()> {
         println!("Get open pulls for {owner}/{repo} ...");
         let pulls_api = github.pulls(&owner, &repo);
         let checks_api = github.checks(&owner, &repo);
-        let pulls = {
-            let mut pulls = github
-                .all_pages(
-                    pulls_api
-                        .list()
-                        .state(octocrab::params::State::Open)
-                        .send()
-                        .await?,
-                )
-                .await?;
-            // Rotate the vector to start at a different place each time, to account for
-            // api.cirrus-ci network errors, which would abort the program. On the next start, it
-            // would start iterating from the same place.
-            let rotate = RandomState::new().build_hasher().finish() as usize % (pulls.len());
-            pulls.rotate_left(rotate);
-            pulls
-        };
+        let pulls = github
+            .all_pages(
+                pulls_api
+                    .list()
+                    .state(octocrab::params::State::Open)
+                    .send()
+                    .await?,
+            )
+            .await?;
         println!("Open pulls: {}", pulls.len());
         for (i, pull) in pulls.iter().enumerate() {
             println!(
