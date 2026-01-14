@@ -258,11 +258,13 @@ async fn main() -> octocrab::Result<()> {
         .is_none()
     {
         println!("Install guix");
-        let guix_tar = format!("guix-binary-1.4.0.{ARCH}-linux.tar.xz");
-        docker_exec(&format!("curl -LO https://ftp.gnu.org/gnu/guix/{guix_tar}"));
+        let guix_tar = format!("guix-binary-1.5.0rc1.{ARCH}-linux.tar.xz");
+        docker_exec(&format!(
+            "curl -LO https://files.ditigal.xyz/guix-release-1.5.0rc1-mirror/{guix_tar}"
+        ));
         docker_exec(&format!(
             "echo '{}  ./{}' | sha256sum -c",
-            "236ca7c9c5958b1f396c2924fcc5bc9d6fdebcb1b4cf3c7c6d46d4bf660ed9c9", guix_tar
+            "831e22ddf3c5d8b92355abd5af1ad51514f93507c58757afc18bda62006c7f79", guix_tar
         ));
         docker_exec(&format!("tar -xf ./{}", guix_tar));
         docker_exec("mv var/guix/* /var/guix && mv gnu/* /gnu/");
@@ -301,7 +303,6 @@ async fn main() -> octocrab::Result<()> {
         docker_exec(
             "sed -i -e 's/DBUILD_BENCH=OFF/DBUILD_BENCH=ON/g' $( git grep -l BUILD_BENCH ./contrib/guix/ )",
         );
-        docker_exec("sed -i '/ x86_64-w64-mingw32$/d' ./contrib/guix/guix-build"); // For now, until guix 1.5
         docker_exec_ret_code(&format!(
             "( guix-daemon --build-users-group=guixbuild & (export V=1 && export VERBOSE=1 && export MAX_JOBS={} && export SOURCES_PATH={} && ./contrib/guix/guix-build > {}/outerr 2>&1 ) && kill %1 )",
             args.guix_jobs, depends_sources_dir_str, git_repo_dir_str
