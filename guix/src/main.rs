@@ -304,7 +304,7 @@ async fn main() -> octocrab::Result<()> {
             "sed -i -e 's/DBUILD_BENCH=OFF/DBUILD_BENCH=ON/g' $( git grep -l BUILD_BENCH ./contrib/guix/ )",
         );
         docker_exec_ret_code(&format!(
-            "( guix-daemon --build-users-group=guixbuild & (export V=1 && export VERBOSE=1 && export MAX_JOBS={} && export SOURCES_PATH={} && ./contrib/guix/guix-build > {}/outerr 2>&1 ) && kill %1 )",
+            "( LC_ALL=en_US.UTF-8 guix-daemon --build-users-group=guixbuild & (export V=1 && export VERBOSE=1 && export MAX_JOBS={} && export SOURCES_PATH={} && ./contrib/guix/guix-build > {}/outerr 2>&1 ) && kill %1 )",
             args.guix_jobs, depends_sources_dir_str, git_repo_dir_str
         ));
         docker_exec(&format!("rm -rf {}/*", depends_cache_dir_str));
