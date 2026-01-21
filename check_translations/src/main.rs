@@ -140,16 +140,16 @@ fn check(
     // Sadly, the language support of LLMs is mixed and usually not well documented, except for the
     // Gemini series.
     //
-    // See https://ai.google.dev/gemini-api/docs/models#supported-languages
+    // See https://web.archive.org/web/20250905054139/ai.google.dev/gemini-api/docs/models#supported-languages
     //
     // However, the stronger Gemini models come with strict rate limits in Tier 1.
     //
     // From https://ai.google.dev/gemini-api/docs/rate-limits#tier-1
     let url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions";
-    let model = "gemini-2.5-pro";
+    let model = "gemini-3-flash-preview";
 
-//    let url = "https://api.openai.com/v1/chat/completions";
-//    let model = "gpt-5";
+    //let url = "https://api.openai.com/v1/chat/completions";
+    //let model = "gpt-5.1";
 
     report_file
         .write_all(format!("\n\n<details><summary>{lang}</summary>\n\n[If the result is outdated or of low quality, please file an issue to request and updated run for this language.](../../issues/new?title=%5B{lang}%5D%20request)\n\n").as_bytes())
@@ -165,28 +165,26 @@ fn check(
         let msg = msg
             // shorten msg in prompt
             .replace("<translation type=\"unfinished\">", "<translation>");
-        let shortcut_key_prompt = if msg.contains("&amp;") {
-            "- A single &amp; in the English text and the translation is usually used to indicate the shortcut key. Allow it to be placed anywhere, but ensure it exists exactly once."
-        } else {
-            ""
-        };
-        let prompt = format!(
-            r#"
-Evaluate the provided translation from English to the language '{lang}' for unwanted content, erroneous content, or spam.
+        let prompt_overview = r#"
+You are a translation reviewer. You will be provided with detailed instructions next. Finally, with
+the translation to evaluate.
+"#;
+        let prompt_instructions = r#"
+Evaluate the provided translation from English to the given language for unwanted content, erroneous content, or spam.
 
 - Assess the translation for accuracy and whether it is problematic in any way.
 - The English text is wrapped in <source></source>
-- The '{lang}' text is wrapped in <translation></translation>
+- The translated text is wrapped in <translation></translation>
 - Ensure that format specifiers (% prefix) are taken over correctly from the source to the translation.
 - Ensure that no whitespace format issues exist. For example, stray spacing or double space.
-{shortcut_key_prompt}
+- A single &amp; in the English text and the translation is usually used to indicate the shortcut key. Allow it to be placed anywhere, but ensure it exists exactly once.
 
 
 # Output Format
 
 - If the translation is unproblematic, output: "NO".
-- If you are unfamiliar with the language specified by '{lang}', output: "UNK_LANG".
-- If the translation is into a language completely unrelated to '{lang}', or contains unrelated gibberish, output: "SPAM", followed by a brief explanation and the correct translation.
+- If you are unfamiliar with the language specified by the language code, output: "UNK_LANG".
+- If the translation is into a language completely unrelated to the language specified by the language code, or contains unrelated gibberish, output: "SPAM", followed by a brief explanation and the correct translation.
 - If the translation is problematic for other reasons, output: "ERR", followed by a brief explanation and the correct translation.
 - You must start your output with "NO", "ERR", "SPAM", or "UNK_LANG".
 
@@ -249,16 +247,19 @@ The translation is in Polish, not German as requested.
 Correct translation:
 Ausgewählte Adresse aus der Liste entfernen
 </reply>
-
-
+"#;
+        let prompt_tx = format!(
+            r#"
 # Translation
 
 Evaluate this '{lang}' translation:
 
 {msg}
 
-"#,
+"#
         );
+
+        let debug_prompt = format!("{prompt_overview}\n{prompt_instructions}\n{prompt_tx}");
 
         let cache_file = cache_dir.join(cache_key(lang, &msg));
 
@@ -268,21 +269,24 @@ Evaluate this '{lang}' translation:
                     &mut num_issues,
                     &cache_file,
                     &contents,
-                    &prompt,
+                    &debug_prompt,
                     &msg,
                     report_file,
                 );
             }
             Err(_) => {
                 println!(
-                    "Cache miss [file= {file}] for prompt=\n{prompt}",
+                    "Cache miss [file= {file}] for prompt=\n{debug_prompt}",
                     file = cache_file.display()
                 );
                 let sleep_target = Instant::now() + rate_limit_wait;
                 let payload = json!({
+                  "reasoning_effort": "low",
                   "model": model,
                   "messages": [
-                    {"role": "user", "content": prompt}
+                    {"role": "user", "content": prompt_overview },
+                    {"role": "user", "content": prompt_instructions },
+                    {"role": "user", "content": prompt_tx},
                 ]
                 });
 
@@ -314,7 +318,7 @@ Evaluate this '{lang}' translation:
                     &mut num_issues,
                     &cache_file,
                     val,
-                    &prompt,
+                    &debug_prompt,
                     &msg,
                     report_file,
                 );
