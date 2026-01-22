@@ -183,7 +183,9 @@ pub const LLM_PROMPT_CMP_MACROS: &str = r#"
 Scan the provided git diff for test comparisons that rely on generic check macros or bare assertions instead of using the comparison-specific helpers.
 
 - Focus only on lines added (starting with a + in the diff).
-- Do not flag any C++ code. Do not flag Boost.Test C++ code. Do not flag fuzz C++ code.
+- In C++ only look for the BOOST_CHECK_THROW Boost.Test macro that only check a generic exception type and not a detailed message, for example:
+  * BOOST_CHECK_THROW(obj.write(), std::runtime_error) -> BOOST_CHECK_EXCEPTION(obj.write(), std::runtime_error, HasReason("the exact failure message"))
+- Do not flag bare assert(...) checks or any other boost test macros in any C++ code.
 - In Python, functional tests under test/functional/, look for bare assert statements using built‑in comparison operators where a helper is clearly more appropriate. Only the following helpers are available:
   * assert a == b → assert_equal(a, b)
   * assert a != b → assert_not_equal(a, b)
