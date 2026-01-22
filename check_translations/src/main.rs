@@ -281,7 +281,7 @@ Evaluate this '{lang}' translation:
                 );
                 let sleep_target = Instant::now() + rate_limit_wait;
                 let payload = json!({
-                  "reasoning_effort": "low",
+                  "reasoning_effort": "low", // Can change to "high" after a first pre-filter run, for better results.
                   "model": model,
                   "messages": [
                     {"role": "user", "content": prompt_overview },
