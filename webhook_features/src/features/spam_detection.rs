@@ -335,13 +335,15 @@ async fn spam_pr_heuristic(
         let sw = |p| f.filename.starts_with(p);
         let ct = |p| f.filename.contains(p);
         sw("README.md")
-            || sw("doc/release-notes/") // Must include trailing slash
             || sw("INSTALL.md")
             || ct("CONTRIBUTING")
             || ct("LICENSE")
             || ct(".devcontainer/devcontainer.json")
             || ct("SECURITY")
             || ct("FUNDING")
+              // Must include trailing slash,
+              // also re-triggers on the above "archived check":
+            || sw("doc/release-notes/")
     })
         // The next check will also detect a fully empty diff
         || all_files.iter().all(|f| f.status == DiffEntryStatus::Removed)
