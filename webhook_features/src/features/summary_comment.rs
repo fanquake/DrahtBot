@@ -236,7 +236,7 @@ For details see: https://corecheck.dev/{owner}/{repo}/pulls/{pull_num}.
                     text = format!(
                         "\n### LLM Linter (✨ experimental)\n\n{issues}\n\n<sup>{date}</sup>\n",
                         issues = issues.join("\n"),
-                        date = chrono::Utc::now().format("%F")
+                        date = chrono::Utc::now().format("%F %H:%M:%S")
                     );
                 }
             }
