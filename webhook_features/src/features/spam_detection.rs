@@ -381,5 +381,29 @@ search results.
             }
         }
     }
+    if all_files
+        .iter()
+        .any(|f| f.filename.starts_with("src/qt/locale/bitcoin_"))
+    {
+        let pull_request = pulls_api.get(pr_number).await?;
+        if [FirstTimer, FirstTimeContributor, Mannequin, None]
+            .contains(&pull_request.author_association.unwrap())
+        {
+            let reason = r#"
+🌐 Thanks for the translation change. However, translations should not be submitted as pull
+requests. Please see Translation Process for more information on helping with translations:
+
+https://github.com/bitcoin/bitcoin/blob/master/doc/translation_process.md
+"#;
+            if !dry_run {
+                issues_api.create_comment(pr_number, reason).await?;
+                issues_api
+                    .update(pr_number)
+                    .state(octocrab::models::IssueState::Closed)
+                    .send()
+                    .await?;
+            }
+        }
+    }
     Ok(())
 }
