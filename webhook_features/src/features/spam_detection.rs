@@ -331,10 +331,15 @@ async fn spam_pr_heuristic(
         .send()
         .await?
         .items;
-    if all_files.iter().any(|f| {
-        let sw = |p| f.filename.starts_with(p);
-        let ct = |p| f.filename.contains(p);
-        sw("README.md")
+    if all_files.len() >= 15
+        || some_commits.iter().any(|c| {
+            let ct = |m| c.commit.message.contains(m);
+            ct("Claude ")
+        })
+        || all_files.iter().any(|f| {
+            let sw = |p| f.filename.starts_with(p);
+            let ct = |p| f.filename.contains(p);
+            sw("README.md")
             || sw("INSTALL.md")
             || ct("CONTRIBUTING")
             || ct("LICENSE")
@@ -344,18 +349,15 @@ async fn spam_pr_heuristic(
               // Must include trailing slash,
               // also re-triggers on the above "archived check":
             || sw("doc/release-notes/")
-    })
-        // The next check will also detect a fully empty diff
-        || all_files.iter().all(|f| f.status == DiffEntryStatus::Removed)
+        })
+        || all_files.is_empty()
+        || all_files
+            .iter()
+            .all(|f| f.status == DiffEntryStatus::Removed)
         || all_files.iter().all(|f| f.status == DiffEntryStatus::Added)
         || all_files
             .iter()
             .any(|f| f.filename.starts_with(".github") && f.status == DiffEntryStatus::Added)
-        || all_files.len() >= 15
-        || some_commits.iter().any(|c| {
-            let ct = |m| c.commit.message.contains(m);
-            ct("Claude ")
-        })
     {
         let pull_request = pulls_api.get(pr_number).await?;
         if [FirstTimer, FirstTimeContributor, Mannequin, None]
