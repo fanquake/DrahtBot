@@ -107,4 +107,4 @@ repositories:
         - '^scripted-diff:'
     spam_detection: true
     ci_status: true
-    corecheck: true
+    corecheck: false  # Temporarily disabled due to https://github.com/corecheck/corecheck/issues/150
