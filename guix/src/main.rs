@@ -42,10 +42,10 @@ struct Args {
 const ID_GUIX_COMMENT: &str = "<!--9cd9c72976c961c55c7acef8f6ba82cd-->";
 // Only update this after the change is merged to the main development branch of --github_repo:
 //
-// curl -LO "https://bitcoincore.org/depends-sources/sdks/Xcode-15.0-15A240d-extracted-SDK-with-libcxx-headers.tar.gz"
-// mv                                                   ./Xcode-15.0-15A240d-extracted-SDK-with-libcxx-headers.tar.gz ./guix/
-// cp                                              ./guix/Xcode-15.0-15A240d-extracted-SDK-with-libcxx-headers.tar.gz ./scratch/guix/
-const CURRENT_XCODE_FILENAME: &str = "Xcode-15.0-15A240d-extracted-SDK-with-libcxx-headers.tar.gz";
+// curl -fLO "https://bitcoincore.org/depends-sources/sdks/Xcode-26.1.1-17B100-extracted-SDK-with-libcxx-headers.tar"
+// mv                                                    ./Xcode-26.1.1-17B100-extracted-SDK-with-libcxx-headers.tar ./guix/
+// cp                                               ./guix/Xcode-26.1.1-17B100-extracted-SDK-with-libcxx-headers.tar ./scratch/guix/
+const CURRENT_XCODE_FILENAME: &str = "Xcode-26.1.1-17B100-extracted-SDK-with-libcxx-headers.tar";
 
 fn lsdir<T: FromIterator<String>>(folder: &Path) -> T {
     fs::read_dir(folder)
@@ -203,7 +203,7 @@ async fn main() -> octocrab::Result<()> {
         "run",
         "-idt",
         "--rm",
-        "--privileged", // https://github.com/bitcoin/bitcoin/pull/17595#issuecomment-606407804
+        "--privileged", // https://github.com/bitcoin/bitcoin/pull/17595#issuecomment-606407804, not fixed in guix 1.5? https://guix.gnu.org/en/blog/2026/gnu-guix-1.5.0-released/#:~:text=Security%20improvements
         &format!("--volume={guix_store_dir_str}:{}:rw,z", "/gnu"),
         &format!("--volume={guix_bin_dir_str}:{}:rw,z", "/var/guix"),
         &format!("--volume={temp_dir_str}:{temp_dir_str}:rw,z",),
