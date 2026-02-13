@@ -71,12 +71,12 @@ fn main() {
         let mut report_file = fs::File::create(report_folder.join(format!("{lang}.md")))
             .expect("must be able to create empty report file");
         report_file
-        .write_all("# Translations Review by LLM (✨ experimental)\n\nThe review quality depends on the LLM and the language. To report LLM shortcomings for a specific language, please file an issue. It may be possible to re-run with a stronger model.\n\n".as_bytes())
+        .write_all("# Translations Review by LLM (✨ experimental)\n\nThe review quality depends on the LLM and the language. To report LLM shortcomings for a specific language, please file an issue. It may be possible to re-run with a stronger model. Check the git metadata of this file for the creation date.\n\n".as_bytes())
         .unwrap();
 
         check(
             lang,
-            &cache_dir,
+            &cache_dir.join(lang),
             &ts,
             &args.llm_api_key,
             &report_file,
@@ -131,7 +131,7 @@ fn print_result(
 
 fn check(
     lang: &str,
-    cache_dir: &Path,
+    lang_cache_dir: &Path,
     ts: &str,
     token: &str,
     mut report_file: &fs::File,
@@ -187,6 +187,7 @@ Evaluate the provided translation from English to the given language for unwante
 - If the translation is into a language completely unrelated to the language specified by the language code, or contains unrelated gibberish, output: "SPAM", followed by a brief explanation and the correct translation.
 - If the translation is problematic for other reasons, output: "ERR", followed by a brief explanation and the correct translation.
 - You must start your output with "NO", "ERR", "SPAM", or "UNK_LANG".
+- The example replies below are wrapped in <reply></reply> for clarity. Do not include those tags in your own reply.
 
 
 # Translation context
@@ -261,7 +262,8 @@ Evaluate this '{lang}' translation:
 
         let debug_prompt = format!("{prompt_overview}\n{prompt_instructions}\n{prompt_tx}");
 
-        let cache_file = cache_dir.join(lang).join(cache_key(lang, &msg));
+        fs::create_dir_all(lang_cache_dir).expect("must be able to create lang cache dir");
+        let cache_file = lang_cache_dir.join(cache_key(lang, &msg));
 
         match fs::read_to_string(&cache_file) {
             Ok(contents) => {
