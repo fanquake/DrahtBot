@@ -166,7 +166,7 @@ Check C++ and Python code in the provided git diff for function calls where inte
 - Do not flag or suggest changes for arguments that are already named or where such a comment would be more confusing.
 - Do not flag the first two argument of a function call. Only flag the third and later arguments.
 - Do not flag string literals.
-- Do not flag cases where adding a name comment or keyword would be more confusing or noisy than helpful.
+- Do not flag cases where adding a name comment or keyword would be more confusing or noisy than helpful, like std::max or std::format.
 - Limit findings and suggestions to literals (do not suggest for variables or expressions).
 - If no opportunities are found, say "{magic_all_good}".
 
