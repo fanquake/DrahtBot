@@ -159,14 +159,11 @@ Check C++ and Python code in the provided git diff for function calls where inte
 - Focus solely on lines added (starting with a + in the diff).
 - In C++: Look for function calls with literals as positional arguments. Recommend replacing `func(x, 0)` with `func(x, /*named_arg=*/0)`.
 - In Python: Look for function calls with literals as positional arguments. Recommend replacing `func(x, 0)` with `func(x, named_arg=0)` if the argument is not already named or is already using keyword syntax.
-- Only suggest if there are benefits, such as:
-  - Improved readability and documentation, when the meaning of the literal is not obvious from the context
-  - Reduced risk of misordered or misunderstood arguments, when the order is not obvious from the context
-  - Easier code reviews and future-proofing, especially when there are several literal values
+- Only suggest a named arg if the meaning of the integral literal is ambiguous and not obvious from the context.
 - Do not flag or suggest changes for arguments that are already named or where such a comment would be more confusing.
 - Do not flag the first two argument of a function call. Only flag the third and later arguments.
 - Do not flag string literals.
-- Do not flag cases where adding a name comment or keyword would be more confusing or noisy than helpful, like std::max or std::format.
+- Do not flag cases where adding a name comment or keyword would be more confusing or noisy than helpful, like std::max, std::format, or other well-understood stdlib functions.
 - Limit findings and suggestions to literals (do not suggest for variables or expressions).
 - If no opportunities are found, say "{magic_all_good}".
 
