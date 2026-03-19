@@ -190,7 +190,7 @@ body: {body}
 "#
     );
     let payload = serde_json::json!({
-      "model": "gpt-5-mini",
+      "model": "gpt-5.4-nano",
       "messages": [
         {
           "role": "developer",
@@ -256,7 +256,7 @@ SPAM. This issue references a cryptocurrency which is unrelated to Bitcoin. It a
         "type": "text"
       },
       "verbosity": "low",
-      "reasoning_effort": "low",
+      "reasoning_effort": "medium",
       "service_tier": "default",
       "store": true
     });
