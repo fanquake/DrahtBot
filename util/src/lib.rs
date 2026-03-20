@@ -189,7 +189,7 @@ Scan the provided git diff for test comparisons that rely on generic check macro
   * assert a > b → assert_greater_than(a, b)
   * assert a >= b → assert_greater_than_or_equal(a, b)
   * assert abs(v - vexp) < 0.00001 → assert_approx(v, vexp, vspan=...)
-- In Python: Look for bare `assert a == b`. Recommend assert_equal.
+- In Python do not flag membership checks like `a in b` or `a not in b`.
 - Only flag instances where the intent is explicit and the specialized macro is clearly applicable to avoid noise.
 - If no changes are needed, say "{magic_all_good}".
 
