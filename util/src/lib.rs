@@ -184,12 +184,14 @@ Scan the provided git diff for test comparisons that rely on generic check macro
   * BOOST_CHECK_THROW(obj.write(), std::runtime_error) -> BOOST_CHECK_EXCEPTION(obj.write(), std::runtime_error, HasReason("the exact failure message"))
 - Do not flag bare assert(...) checks or any other boost test macros in any C++ code.
 - In Python, functional tests under test/functional/, look for bare assert statements using built‑in comparison operators where a helper is clearly more appropriate. Only the following helpers are available:
+  * assert a is b → assert_equal(a, b)
   * assert a == b → assert_equal(a, b)
+  * assert a is not b → assert_not_equal(a, b)
   * assert a != b → assert_not_equal(a, b)
   * assert a > b → assert_greater_than(a, b)
   * assert a >= b → assert_greater_than_or_equal(a, b)
   * assert abs(v - vexp) < 0.00001 → assert_approx(v, vexp, vspan=...)
-- In Python do not flag membership checks like `a in b` or `a not in b`.
+- In Python do not flag asserts on expressions that are guaranteed to evaluate to `bool`. E.g `a in b` or `a not in b`.
 - Only flag instances where the intent is explicit and the specialized macro is clearly applicable to avoid noise.
 - If no changes are needed, say "{magic_all_good}".
 
