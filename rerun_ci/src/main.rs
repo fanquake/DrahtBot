@@ -33,6 +33,7 @@ async fn rerun_first(
         println!("Re-run task {n} (id: {i})", n = task.name, i = task.id);
         if !dry_run {
             util::check_call(std::process::Command::new("curl").args([
+                "--fail",
                 "-L",
                 "-X",
                 "POST",

@@ -260,7 +260,7 @@ async fn main() -> octocrab::Result<()> {
         println!("Install guix");
         let guix_tar = format!("guix-binary-1.5.0rc1.{ARCH}-linux.tar.xz");
         docker_exec(&format!(
-            "curl -LO https://files.ditigal.xyz/guix-release-1.5.0rc1-mirror/{guix_tar}"
+            "curl --fail -LO https://files.ditigal.xyz/guix-release-1.5.0rc1-mirror/{guix_tar}"
         ));
         docker_exec(&format!(
             "echo '{}  ./{}' | sha256sum -c",

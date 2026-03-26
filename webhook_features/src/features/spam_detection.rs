@@ -267,6 +267,7 @@ SPAM. This issue references a cryptocurrency which is unrelated to Bitcoin. It a
         .json(&payload)
         .send()
         .await?
+        .error_for_status()?
         .json::<serde_json::Value>()
         .await?;
     let text = response["choices"][0]["message"]["content"]

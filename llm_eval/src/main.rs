@@ -100,6 +100,7 @@ fn check_google_ai(cli: &Cli, outputs: &Path, file_name: &str, diff: &str) {
         .arg(format!(
             "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite-preview-06-17:generateContent?key={}"
             ,cli.google_ai_token))
+        .arg("--fail")
         .arg("-H")
         .arg("Content-Type: application/json")
         .arg("-X")
@@ -142,6 +143,7 @@ fn check_open_ai(cli: &Cli, outputs: &Path, file_name: &str, diff: &str) {
     )
     .expect("Must be able to write file");
     let curl_out = Command::new("curl")
+        .arg("--fail")
         .arg("-X")
         .arg("POST")
         .arg("https://api.openai.com/v1/chat/completions")

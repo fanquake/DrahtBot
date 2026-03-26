@@ -476,7 +476,13 @@ fn parse_review(comment: &str) -> Option<AckCommit> {
 async fn get_llm_check(llm_diff_pr: &str, llm_token: &str) -> Result<Vec<String>> {
     let client = reqwest::Client::new();
     println!(" ... Run LLM check.");
-    let diff = client.get(llm_diff_pr).send().await?.text().await?;
+    let diff = client
+        .get(llm_diff_pr)
+        .send()
+        .await?
+        .error_for_status()?
+        .text()
+        .await?;
 
     let diff = util::prepare_raw_diff_for_llm(&diff);
     let mut issues = Vec::new();

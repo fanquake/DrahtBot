@@ -293,6 +293,7 @@ Evaluate this '{lang}' translation:
                 });
 
                 let curl_out = Command::new("curl")
+                    .arg("--fail")
                     .arg("-X")
                     .arg("POST")
                     .arg("-H")

@@ -145,6 +145,7 @@ impl Feature for CiStatusFeature {
                         {
                             let curl_out = Command::new("curl")
                                 .args([
+                                    "--fail",
                                     "-L",
                                     "-H",
                                     "Accept: application/vnd.github+json",
@@ -291,6 +292,7 @@ A single short sentence summarizing the underlying reason for the CI failure.
         .json(&payload)
         .send()
         .await?
+        .error_for_status()?
         .json::<serde_json::Value>()
         .await?;
     let text = response["choices"][0]["message"]["content"]
