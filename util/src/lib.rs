@@ -138,7 +138,7 @@ impl LlmCheck {
 pub const LLM_PROMPT_TYPOS: &str = r#"
 Identify and provide feedback on typographic or grammatical errors in the provided git diff comments or documentation, focusing exclusively on errors impacting comprehension.
 
-- Flag only if the English is clearly broken or the intended meaning cannot be understood without guessing.
+- Flag only if a word is misspelled, or the English is clearly broken and the intended meaning cannot be understood without guessing.
 - Ignore style preferences, such as Oxford comma, missing or superfluous commas, missing articles, and missing or inconsistent punctuation.
 - Focus solely on lines added (starting with a + in the diff).
 - Address only code comments (for example C++ or Python comments) or documentation (for example inline strings or markdown files).
