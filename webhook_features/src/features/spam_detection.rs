@@ -200,7 +200,7 @@ body: {body}
               "text":
 r#"
 Detect whether the provided GitHub issue or pull request is SPAM or NORMAL based on its content.
-Start your reply with either SPAM or NORMAL. If you claim SPAM, you must include an explanation.
+Start your reply with either SPAM or NORMAL. If you claim SPAM, you must include an explanation in English.
 Do not include any direct or verbatim references to the spam content (Promotional names, websites, services, ...)
 
 - Analyze the title and body to determine if it is legitimate discussion or unwanted/irrelevant promotional content.
