@@ -168,7 +168,7 @@ impl Feature for CiStatusFeature {
                             let text = full_text
                                 .lines()
                                 .rev()
-                                .take(100) // 100 lines
+                                .take(500) // lines
                                 .collect::<Vec<_>>()
                                 .into_iter()
                                 .rev()
