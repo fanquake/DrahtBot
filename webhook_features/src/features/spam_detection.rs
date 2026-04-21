@@ -332,7 +332,7 @@ async fn spam_pr_heuristic(
         .send()
         .await?
         .items;
-    if all_files.len() >= 15
+    if all_files.len() >= 17
         || some_commits.iter().any(|c| {
             let ct = |m| c.commit.message.contains(m);
             ct("Claude ")
