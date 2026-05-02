@@ -176,7 +176,7 @@ impl Feature for CiStatusFeature {
                                 .join("\n")
                                 .chars()
                                 .rev()
-                                .take(10_000) // 10k unicode chars
+                                .take(20_000) // unicode chars
                                 .collect::<Vec<_>>()
                                 .into_iter()
                                 .rev()
