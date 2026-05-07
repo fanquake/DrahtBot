@@ -823,8 +823,8 @@ mod tests {
 
         // Insert above
         let buffer = ifdp.retrieve_bytes();
-        use std::fs::{self, File};
-        use std::io::{self, Write};
+        use std::fs::{File};
+        use std::io::{Write};
         File::create("/tmp/ifdp.out")
             .unwrap()
             .write_all(&buffer)
