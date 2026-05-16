@@ -28,7 +28,7 @@ index 11f2fbdb8c..9535297f0a 100644
 +  std::cout << std::hex << "ifdp.push_str_u8(&[";
 +  for (uint8_t c : result)
 +      std::cout << "0x" << unsigned(c) << ",";
-+  std::cout << std::dec << "]); // (len=" << result.size() << "), Limit: " << max_length << "\n";
++  std::cout << std::dec << "]); // (len=" << result.size() << "), Limit: " << max_length << " (When the limit is equal to the len, it may actually be unlimited in the format)\n";
    return result;
  }
  
