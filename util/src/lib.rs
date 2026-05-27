@@ -186,7 +186,7 @@ Scan the provided git diff for test comparisons that rely on generic check macro
 - In Python, functional tests under test/functional/, look for bare assert statements using built‑in comparison operators where a helper is clearly more appropriate. Only the following helpers are available:
   * assert a is b → assert_equal(a, b)
   * assert a == b → assert_equal(a, b)
-  * assert a is not b → assert_not_equal(a, b)
+  * assert a is not b → assert_not_equal(a, b) [Note: Omit cases where one arg to assert_not_equal is a fixed constant, because a failure does not need to pretty-print the fixed constant twice]
   * assert a != b → assert_not_equal(a, b)
   * assert a > b → assert_greater_than(a, b)
   * assert a >= b → assert_greater_than_or_equal(a, b)
