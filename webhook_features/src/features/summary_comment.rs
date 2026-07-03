@@ -650,6 +650,13 @@ mod tests {
                 }),
             },
             TestCase {
+                comment: "Risk NACK, I do not think the changes are worth the effort they require and will cause",
+                expected: Some(AckCommit {
+                    ack_type: AckType::ConceptNack,
+                    commit: None,
+                }),
+            },
+            TestCase {
                 comment: "concept NACK",
                 expected: Some(AckCommit {
                     ack_type: AckType::ConceptNack,
