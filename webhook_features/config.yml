@@ -77,6 +77,8 @@ repositories:
         - '^addrman:'
         - '^protocol:'
         - '^net processing:'
+      Private Broadcast:
+        - '^private broadcast:'
       RPC/REST/ZMQ:
         - '^univalue:'
         - '^rpc:'
