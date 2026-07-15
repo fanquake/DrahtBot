@@ -120,10 +120,11 @@ const BOT_SKIP_TAG: &str = "<!--meta-tag:bot-skip-->";
 
 fn summary_comment_template(reviews: Vec<Review>) -> String {
     let review_url = "https://github.com/bitcoin/bitcoin/blob/master/CONTRIBUTING.md#code-review";
+    let ai_policy_url = "https://github.com/bitcoin/bitcoin/blob/master/doc/AI_POLICY.md";
     let mut comment = format!(
         r#"
 ### Reviews
-See [the guideline]({review_url}) for information on the review process.
+See [the guideline]({review_url}) and [AI policy]({ai_policy_url}) for information on the review process.
 "#
     );
     if reviews.is_empty() {
