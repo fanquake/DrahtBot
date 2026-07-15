@@ -46,8 +46,9 @@ repositories:
         - '^validation:'
         - '^chain:'
         - '^kernel:'
-      interfaces:
+      IPC:
         - '^interfaces:'
+        - '^ipc:'
         - '^multiprocess:'
       Wallet:
         - '^wallet:'
